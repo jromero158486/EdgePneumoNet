@@ -1,76 +1,83 @@
 # EdgePneumoNet 🫁📱  
 **Uncertainty-Aware Pneumonia Detection on Edge Devices with Visual Explainability**
 
-EdgePneumoNet is a lightweight, modular framework for detecting pneumonia from chest X-rays using deep learning. It is optimized for deployment on resource-constrained edge devices (e.g., Raspberry Pi, Jetson Nano) with real-time performance, calibrated uncertainty estimates, and interpretable visual explanations.
+EdgePneumoNet is a lightweight, modular framework for detecting pneumonia in chest X-rays. It is optimized for real-time inference on resource-constrained edge devices (e.g., Raspberry Pi 4, Jetson Nano) and provides calibrated uncertainty estimates together with interpretable Grad-CAM heat-maps.
 
 ---
 
 ## Motivation
+Pneumonia remains a leading cause of mortality in low-resource settings. Deep-learning systems can help, yet typical approaches are:
 
-Pneumonia is a leading cause of mortality, especially in low-resource settings. While deep learning can assist in diagnosis, real-world deployment is hindered by:
-- Heavy models incompatible with edge devices.
-- Lack of uncertainty quantification.
-- Poor interpretability for clinicians.
+- Too computationally heavy for edge hardware.  
+- Lacking reliable uncertainty quantification.  
+- Hard to interpret for clinicians.
 
-EdgePneumoNet addresses these challenges by combining:
-- Efficient CNNs (e.g., MobileNetV2, EfficientNet-Lite)
-- Quantization-aware training (QAT)
-- Monte Carlo Dropout for uncertainty estimation
-- Grad-CAM for visual explanations
+**EdgePneumoNet** overcomes these hurdles via:
 
----
-
-## Features
-
-✅ Lightweight models for real-time inference  
-✅ Uncertainty-aware predictions (ECE ≤ 0.03)  
-✅ Visual interpretability with Grad-CAM  
-✅ Quantized inference with ONNX/QAT  
-✅ Deployable on Raspberry Pi 4 and Jetson Nano  
-✅ Modular training/evaluation pipeline  
+- **MobileNetV2** backbone—small and fast.  
+- **Quantization-Aware Training (QAT)** for 8-bit deployment.  
+- **Monte-Carlo Dropout** to estimate predictive uncertainty.  
+- **Grad-CAM** for visual explanations aligned with radiologist intuition.
 
 ---
 
-## 🗂 Project Structure
+## Key Features
+
+| ✔️ | Feature |
+|----|---------|
+| Lightweight MobileNetV2 (≤ 5 MB quantized) |
+| Real-time inference ≥ 10 FPS on Raspberry Pi 4 / Jetson Nano |
+| Calibrated predictions (ECE ≤ 0.03) |
+| Pixel-level uncertainty via MC-Dropout |
+| Explainability with Grad-CAM |
+| End-to-end training / eval pipeline |
+
+---
+
+## Project Structure
+
 EdgePneumoNet/
 ├── config/ # YAML configuration files
 ├── data/ # Dataset loading & preprocessing (RSNA Pneumonia)
-├── models/ # Lightweight CNNs & dropout layers
-├── training/ # Training, loss functions, callbacks
+├── models/ # MobileNetV2 with dropout layers
+├── training/ # Training scripts, loss functions, callbacks
 ├── eval/ # Inference, uncertainty, Grad-CAM
-├── experiments/ # Saved weights, logs, metrics
-├── utils/ # Helpers (metrics, logging, calibration)
+├── utils/ # Metrics, logging, calibration helpers
 ├── requirements.txt
 └── README.md
 
 ## Dataset
 
-We use the **RSNA Pneumonia Detection Challenge** dataset.  
-To download and prepare the data:
+We employ the **RSNA Pneumonia Detection Challenge** dataset.
 
 ```bash
-python data/prepare_rsna.py --path /path/to/dataset
+python data/prepare_rsna.py --path /path/to/rsna
 
-## Clone repository
+## Quick Start
 
+# Clone repository
 git clone https://github.com/your-username/EdgePneumoNet.git
 cd EdgePneumoNet
 
+# Install dependencies
 pip install -r requirements.txt
 
+# Train MobileNetV2
 python training/train.py --config config/train_mobilenet.yaml
 
+# Run MC-Dropout inference
 python eval/mc_inference.py --model checkpoints/mobilenet_qat.pth
 
+# Visualize Grad-CAM on a single image
 python eval/visualize_gradcam.py --image /path/to/image.png
 
-## Performance
+## Performance (RSNA Validation)
 
-| Metric                           | Value                 |
-| -------------------------------- | --------------------- |
-| AUC (RSNA)                       | 0.822 ± 0.004         |
-| F1 Score                         | 0.78                  |
-| Expected Calibration Error (ECE) | 0.0258                |
-| Inference Speed                  | ≥ 10 FPS (Jetson/RPi) |
-| Model Size (QAT)                 | \~4× smaller          |
+| Metric                           | Value             |
+| -------------------------------- | ----------------- |
+| AUC                              | **0.822 ± 0.004** |
+| F1 Score                         | **0.78**          |
+| Expected Calibration Error (ECE) | **0.0258**        |
+| Inference Speed                  | **≥ 10 FPS**      |
+| Model Size (int8 QAT)            | **≈ 4× smaller**  |
 
